@@ -1,0 +1,26 @@
+{
+  "streams": [
+    {
+      "title": "my stream",
+      "description": "new test stream",
+      "id": 1
+    },
+    {
+      "title": "New React stream",
+      "description": "React intro QA session",
+      "id": 5
+    },
+    {
+      "title": "New Test stream",
+      "description": "testing our service 1",
+      "userId": "112121522231627159211",
+      "id": 6
+    },
+    {
+      "title": "React Final Form Stream",
+      "description": "Refactor project",
+      "userId": "112121522231627159211",
+      "id": 7
+    }
+  ]
+}
