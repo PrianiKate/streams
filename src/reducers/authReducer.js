@@ -1,11 +1,11 @@
 import { SIGN_IN, SIGN_OUT } from "../actions/types";
 
-const INITIAL_STATE = {
-  isSignedIn: null,
-  userId: null
-}
+const getInitialState = () => ({
+  isSignedIn: !!localStorage.getItem('auth'),
+  userId: localStorage.getItem('auth') ?? null
+});
 
-const authReducer = (state = INITIAL_STATE, action) => {
+const authReducer = (state = getInitialState(), action) => {
   switch (action.type) {
     case SIGN_IN:
       return { ...state, isSignedIn: true, userId: action.payload };

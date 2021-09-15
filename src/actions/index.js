@@ -1,3 +1,7 @@
+import {
+  setDoc, collection, getDocs, getFirestore, deleteDoc,
+  getDoc, doc, orderBy, query, serverTimestamp, updateDoc,
+} from "firebase/firestore";
 import { 
   CREATE_STREAM, 
   SIGN_IN, 
@@ -7,17 +11,22 @@ import {
   DELETE_STREAM,
   EDIT_STREAM,
 } from "./types";
-import streams from '../apis/streams';
+import firebase from '../apis/firebase';
 import history from '../history';
 
-export const signIn = (userId) => {
+const db = getFirestore(firebase);
+const streamCollection = collection(db, 'streams');
+
+export const signInUser = (userId) => {
+  localStorage.setItem('auth', userId);
   return {
     type: SIGN_IN,
     payload: userId
   };
 };
 
-export const signOut = () => {
+export const signOutUser = () => {
+  localStorage.removeItem('auth');
   return {
     type: SIGN_OUT
   };
@@ -25,34 +34,51 @@ export const signOut = () => {
 
 export const createStream = formValues => async (dispatch, getState) => {
   const { userId } = getState().auth;
-  const response = await streams.post('/streams', { ...formValues, userId });
+  const docRef = doc(streamCollection);
+  const date = serverTimestamp();
+  await setDoc(docRef, { ...formValues, userId, date });
 
-  dispatch({ type: CREATE_STREAM, payload: response.data });
+  dispatch({ type: CREATE_STREAM, payload: {
+      ...formValues,
+      userId,
+      id: docRef.id,
+      date,
+    }
+  });
   history.push('/');
 }
 
 export const fetchStreams = () => async dispatch => {
-  const response = await streams.get('/streams');
+  const streamsRef = query(streamCollection, orderBy('date'));
+  const response = await getDocs(streamsRef);
 
-  dispatch({ type: FETCH_STREAMS, payload: response.data });
+  let streamList = [];
+  response.forEach((doc) => {
+    streamList.push({ id: doc.id, ...doc.data() });
+  });
+
+  dispatch({ type: FETCH_STREAMS, payload: streamList });
 }
 
 export const fetchStream = id => async dispatch => {
-  const response = await streams.get(`/streams/${id}`);
+  const docRef = doc(db, 'streams', id);
+  const response = await getDoc(docRef);
 
-  dispatch({ type: FETCH_STREAM, payload: response.data });
+  dispatch({ type: FETCH_STREAM, payload: { id: response.id, ...response.data() } });
 }
 
 export const deleteStream = id => async dispatch => {
-  await streams.delete(`/streams/${id}`);
+  const docRef = doc(db, 'streams', id);
+  await deleteDoc(docRef);
 
   dispatch({ type: DELETE_STREAM, payload: id });
   history.push('/');
 }
 
 export const editStream = (id, formValues) => async dispatch => {
-  const response = await streams.patch(`/streams/${id}`, formValues);
+  const docRef = doc(db, 'streams', id);
+  await updateDoc(docRef, { ...formValues });
 
-  dispatch({ type: EDIT_STREAM, payload: response.data });
+  dispatch({ type: EDIT_STREAM, payload: { id,  ...formValues } });
   history.push('/');
 }
