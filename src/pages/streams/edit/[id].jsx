@@ -1,6 +1,6 @@
 import React from 'react';
 import StreamEdit from '../../../components/streams/StreamEdit';
-import Container from '../components/Container';
+import Container from '../../../components/Container';
 
 const StreamEditPage = () => (
   <Container>

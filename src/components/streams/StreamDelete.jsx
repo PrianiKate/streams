@@ -42,7 +42,7 @@ class StreamDelete extends React.Component {
         title="Delete Stream"
         content={this.renderContent()}
         actions={this.renderActions()}
-        onDismiss={() => this.props.router.push('/')}
+        onDismiss={() => this.props.history.push('/')}
       />
     );
   }
