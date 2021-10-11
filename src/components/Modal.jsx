@@ -2,7 +2,8 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 
 const Modal = (props) => {
-  return ReactDOM.createPortal(
+  const container = document.getElementById('modal');
+  return container ? ReactDOM.createPortal(
     <div
       onClick={props.onDismiss}
       className="ui dimmer modals visible active"
@@ -20,8 +21,8 @@ const Modal = (props) => {
         </div>
       </div>
     </div>,
-    document.getElementById('modal')
-  );
+    container
+  ) : null;
 }
 
 export default Modal;

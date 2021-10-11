@@ -12,7 +12,7 @@ const StreamEdit = () => {
   const stream = useSelector(state => state.streams[id]);
   useEffect(() => {
     dispatch(fetchStream(id));
-  }, []);
+  }, [dispatch, id]);
 
   const onSubmit = formValues => {
     dispatch(editStream(id, formValues));

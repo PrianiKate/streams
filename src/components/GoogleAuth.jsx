@@ -1,10 +1,19 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
 import { signIn, signOut } from '../actions';
 
 const GoogleAuth = () => {
   const isSignedIn = useSelector(state => state.auth.isSignedIn);
   const dispatch = useDispatch();
+  const auth = useRef();
+
+  const onAuthChange = (isSignedIn) => {
+    if (isSignedIn) {
+      dispatch(signIn(auth.current.currentUser.get().getId()));
+    } else {
+      dispatch(signOut());
+    }
+  };
 
   useEffect(() => {
     window.gapi.load('client:auth2', () => {
@@ -12,27 +21,19 @@ const GoogleAuth = () => {
         clientId: '208935650712-s47b2nsrfmvoqqi3t4133co4uj2bff1e.apps.googleusercontent.com',
         scope: 'email'
       }).then(() => {
-        GoogleAuth.auth = window.gapi.auth2.getAuthInstance();
-        onAuthChange(GoogleAuth.auth.isSignedIn.get());
-        GoogleAuth.auth.isSignedIn.listen(onAuthChange);
+        auth.current = window.gapi.auth2.getAuthInstance();
+        onAuthChange(auth.current.isSignedIn.get());
+        auth.current.isSignedIn.listen(onAuthChange);
       });
     });
   });
 
-  const onAuthChange = isSignedIn => {
-    if (isSignedIn) {
-      dispatch(signIn(GoogleAuth.auth.currentUser.get().getId()));
-    } else {
-      dispatch(signOut());
-    }
-  }
-
   const onSignInClick = () => {
-    GoogleAuth.auth.signIn();
+    auth.current.signIn();
   }
 
   const onSignOutClick = () => {
-    GoogleAuth.auth.signOut();
+    auth.current.signOut();
   }
 
   const renderAuthButton = () => {

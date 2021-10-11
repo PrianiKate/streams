@@ -1,23 +1,24 @@
-import React from 'react';
+import React, { useEffect } from 'react';
+import { useRouter } from 'next/router';
+import { useDispatch, useSelector } from 'react-redux';
 import Link from 'next/link';
-import { withRouter } from 'next/router';
-import { connect } from 'react-redux';
 import Modal from '../Modal';
 import { fetchStream, deleteStream } from '../../actions';
 
-class StreamDelete extends React.Component {
-  componentDidMount() {
-    this.props.fetchStream(this.props.match.params.id)
-  }
+const StreamDelete = () => {
+  const dispatch = useDispatch();
+  const router = useRouter();
+  const id = router.query.id;
+  const stream = useSelector(state => state.streams[id]);
+  useEffect(() => {
+    dispatch(fetchStream(id));
+  }, [dispatch, id]);
 
-  renderActions() {
-    const { id } = this.props.match.params;
-
-    return (
+  const renderActions = () => (
       <>
         <button 
           className="ui negative button"
-          onClick={() => this.props.deleteStream(id)}
+          onClick={() => dispatch(deleteStream(id))}
         >
           Delete
         </button>
@@ -26,33 +27,23 @@ class StreamDelete extends React.Component {
         </Link>
       </>
     );
-  }
 
-  renderContent() {
-    if (!this.props.stream) {
+  const renderContent = () => {
+    if (!stream) {
       return 'Are you sure you want to delete this stream?';
     }
-
-    return `Are you sure you want to delete stream ${this.props.stream.title}?`;
+  
+    return `Are you sure you want to delete stream ${stream.title}?`;
   }
 
-  render() {
-    return (
-      <Modal
-        title="Delete Stream"
-        content={this.renderContent()}
-        actions={this.renderActions()}
-        onDismiss={() => this.props.history.push('/')}
-      />
-    );
-  }
-};
-
-const mapStateToProps = (state, ownProps) => {
-  return { stream: state.streams[ownProps.match.params.id] };
+  return (
+    <Modal
+      title="Delete Stream"
+      content={renderContent()}
+      actions={renderActions()}
+      onDismiss={() => router.push('/')}
+    />
+  );
 }
 
-export default connect(
-  mapStateToProps, 
-  { fetchStream, deleteStream }
-)(withRouter(StreamDelete));
+export default StreamDelete;
