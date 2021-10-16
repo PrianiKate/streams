@@ -1,14 +1,7 @@
-import router from 'next/router';
-import { 
-  CREATE_STREAM, 
+import {  
   SIGN_IN, 
   SIGN_OUT,
-  FETCH_STREAMS,
-  FETCH_STREAM ,
-  DELETE_STREAM,
-  EDIT_STREAM,
 } from './types';
-import streams from '../apis/streams';
 
 export const signIn = (userId) => {
   return {
@@ -23,36 +16,30 @@ export const signOut = () => {
   };
 };
 
-export const createStream = formValues => async (dispatch, getState) => {
-  const { userId } = getState().auth;
-  const response = await streams.post('/streams', { ...formValues, userId });
+// export const createStream = formValues => async (dispatch, getState) => {
+//   const { userId } = getState().auth;
+//   const response = await streams.post('/streams', { ...formValues, userId });
 
-  dispatch({ type: CREATE_STREAM, payload: response.data });
-  router.push('/');
-}
+//   dispatch({ type: CREATE_STREAM, payload: response.data });
+//   router.push('/');
+// }
 
-export const fetchStreams = () => async dispatch => {
-  const response = await streams.get('/streams');
+// export const fetchStream = id => async dispatch => {
+//   const response = await streams.get(`/streams/${id}`);
 
-  dispatch({ type: FETCH_STREAMS, payload: response.data });
-}
+//   dispatch({ type: FETCH_STREAM, payload: response.data });
+// }
 
-export const fetchStream = id => async dispatch => {
-  const response = await streams.get(`/streams/${id}`);
+// export const deleteStream = id => async dispatch => {
+//   await streams.delete(`/streams/${id}`);
 
-  dispatch({ type: FETCH_STREAM, payload: response.data });
-}
+//   dispatch({ type: DELETE_STREAM, payload: id });
+//   router.push('/');
+// }
 
-export const deleteStream = id => async dispatch => {
-  await streams.delete(`/streams/${id}`);
+// export const editStream = (id, formValues) => async dispatch => {
+//   const response = await streams.patch(`/streams/${id}`, formValues);
 
-  dispatch({ type: DELETE_STREAM, payload: id });
-  router.push('/');
-}
-
-export const editStream = (id, formValues) => async dispatch => {
-  const response = await streams.patch(`/streams/${id}`, formValues);
-
-  dispatch({ type: EDIT_STREAM, payload: response.data });
-  router.push('/');
-}
+//   dispatch({ type: EDIT_STREAM, payload: response.data });
+//   router.push('/');
+// }

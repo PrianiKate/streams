@@ -1,20 +1,26 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import Link from 'next/link';
-import { useDispatch, useSelector } from 'react-redux';
-import { fetchStreams } from '../../actions';
+import { useQuery } from '@apollo/client';
+import { GET_STREAMS_QUERY } from '../../apis/graghQL';
+import { authVar } from '../../apolloClient';
 
 const StreamList = () => {
-  const dispatch = useDispatch();
-  const streams = Object.values(useSelector(state => state.streams));
-  const currentUserId = useSelector(state => state.auth.userId);
-  const isSignedIn = useSelector(state => state.auth.isSignedIn);
+  const { userId, isSignedIn } = authVar;
 
-  useEffect(() => {
-    dispatch(fetchStreams());
-  }, [dispatch]);
+  const { data, loading, error } = useQuery(GET_STREAMS_QUERY);
+  if (loading) {
+    return <div>Loading</div>;
+  }
+
+  if (error) {
+    return <div>Error</div>;
+  }
+
+  const streams = data.allStreams;
+  console.log(streams);
 
   const renderAdmin = (stream) => {
-    if (stream.userId === currentUserId) {
+    if (stream.userId === userId) {
       return (
         <div className="right floated content">
           <Link 

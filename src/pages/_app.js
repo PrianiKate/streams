@@ -1,12 +1,13 @@
-import { Provider } from 'react-redux';
-import { useStore } from '../store';
+import { ApolloProvider } from '@apollo/client';
+import { useApollo } from '../apolloClient';
+
 
 export default function App({ Component, pageProps }) {
-  const store = useStore(pageProps.initialReduxState);
+  const apolloClient = useApollo(pageProps);
 
   return (
-    <Provider store={store}>
+    <ApolloProvider client={apolloClient}>
       <Component {...pageProps} />
-    </Provider>
+    </ApolloProvider>
   )
 };

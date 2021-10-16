@@ -1,25 +1,34 @@
 import React, { useEffect, useRef } from 'react';
 import flv from 'flv.js';
 import { useRouter } from 'next/router';
-import { useSelector, useDispatch } from 'react-redux';
-import { fetchStream } from '../../actions';
+import { useQuery } from '@apollo/client';
+import { GET_STREAM_BY_ID_QUERY } from '../../apis/graghQL';
 
 const StreamShow = () => {
   const router = useRouter();
   const videoRef = useRef();
   const id = router.query.id;
-  const stream = useSelector(state => state.streams[id]);
-  const dispatch = useDispatch();
+  
   let player = null;
-
-  useEffect(() => {
-    dispatch(fetchStream(id));
-  }, [dispatch, id]);
 
   useEffect(() => {
     buildPlayer();
     return () => player.destroy();
   });
+
+  const { data, loading, error } = useQuery(GET_STREAM_BY_ID_QUERY, {
+    id
+  });
+
+  if (loading) {
+    return <div>Loading</div>;
+  }
+
+  if (error) {
+    return <div>Error</div>;
+  }
+
+  const stream = data.Stream;
 
   const buildPlayer = () => {
     if (player || !stream) {
@@ -34,9 +43,6 @@ const StreamShow = () => {
     player.load();
   }
 
-  if (!stream) {
-    return <div>Loading...</div>;
-  }
   const { title, description } = stream;
 
   return (

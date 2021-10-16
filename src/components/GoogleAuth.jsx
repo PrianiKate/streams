@@ -1,19 +1,10 @@
 import React, { useEffect, useRef } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { signIn, signOut } from '../actions';
+import { useReactiveVar } from '@apollo/client';
+import { authInitialState, authVar } from '../apolloClient';
 
 const GoogleAuth = () => {
-  const isSignedIn = useSelector(state => state.auth.isSignedIn);
-  const dispatch = useDispatch();
+  const authState = useReactiveVar(authVar);
   const auth = useRef();
-
-  const onAuthChange = (isSignedIn) => {
-    if (isSignedIn) {
-      dispatch(signIn(auth.current.currentUser.get().getId()));
-    } else {
-      dispatch(signOut());
-    }
-  };
 
   useEffect(() => {
     window.gapi.load('client:auth2', () => {
@@ -22,24 +13,27 @@ const GoogleAuth = () => {
         scope: 'email'
       }).then(() => {
         auth.current = window.gapi.auth2.getAuthInstance();
-        onAuthChange(auth.current.isSignedIn.get());
-        auth.current.isSignedIn.listen(onAuthChange);
       });
     });
   });
 
   const onSignInClick = () => {
     auth.current.signIn();
+    authVar({
+      isSignedIn: true,
+      userId: auth.current.currentUser.get().getId()
+    });
   }
 
   const onSignOutClick = () => {
     auth.current.signOut();
+    authVar({
+      ...authInitialState
+    });
   }
 
   const renderAuthButton = () => {
-    if (isSignedIn === null) {
-      return null;
-    } else if (isSignedIn) {
+    if (authState.isSignedIn) {
       return (
         <button 
           onClick={onSignOutClick} 
