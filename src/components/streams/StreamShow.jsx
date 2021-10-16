@@ -11,6 +11,19 @@ const StreamShow = () => {
   
   let player = null;
 
+  const buildPlayer = () => {
+    if (player || !stream) {
+      return;
+    }
+    
+    player = flv.createPlayer({
+      type: 'flv',
+      url: `http://localhost:8000/live/${id}.flv`
+    });
+    player.attachMediaElement(videoRef.current);
+    player.load();
+  }
+
   useEffect(() => {
     buildPlayer();
     return () => player.destroy();
@@ -29,19 +42,6 @@ const StreamShow = () => {
   }
 
   const stream = data.Stream;
-
-  const buildPlayer = () => {
-    if (player || !stream) {
-      return;
-    }
-    
-    player = flv.createPlayer({
-      type: 'flv',
-      url: `http://localhost:8000/live/${id}.flv`
-    });
-    player.attachMediaElement(videoRef.current);
-    player.load();
-  }
 
   const { title, description } = stream;
 
