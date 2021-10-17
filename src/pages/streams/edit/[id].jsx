@@ -1,10 +1,11 @@
 import React from 'react';
 import StreamEdit from '../../../components/streams/StreamEdit';
 import Container from '../../../components/Container';
+import StreamLoadById from '../../../components/streams/StreamLoadById';
 
 const StreamEditPage = () => (
   <Container>
-    <StreamEdit />
+    <StreamLoadById Component={StreamEdit} />
   </Container>
 );
 

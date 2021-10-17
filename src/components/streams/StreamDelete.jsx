@@ -1,24 +1,31 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useRouter } from 'next/router';
-import { useDispatch, useSelector } from 'react-redux';
+import { useMutation } from '@apollo/client';
 import Link from 'next/link';
 import Modal from '../Modal';
-import { fetchStream, deleteStream } from '../../actions';
+import { DELETE_STREAM_MUTATION, GET_STREAMS_QUERY } from '../../apis/graghQL';
 
-const StreamDelete = () => {
-  const dispatch = useDispatch();
+const StreamDelete = (stream) => {
+  const [deleteStream] = useMutation(DELETE_STREAM_MUTATION, {
+    refetchQueries: [
+      { query: GET_STREAMS_QUERY }
+    ]
+  });
   const router = useRouter();
   const id = router.query.id;
-  const stream = useSelector(state => state.streams[id]);
-  useEffect(() => {
-    dispatch(fetchStream(id));
-  }, [dispatch, id]);
+
+  const onClickDelete = () => {
+    deleteStream({ variables: { id } })
+      .then(() => {
+        router.push('/');
+      });
+  };
 
   const renderActions = () => (
       <>
         <button 
           className="ui negative button"
-          onClick={() => dispatch(deleteStream(id))}
+          onClick={() => onClickDelete()}
         >
           Delete
         </button>

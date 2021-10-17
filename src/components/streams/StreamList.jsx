@@ -1,13 +1,13 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import Link from 'next/link';
-import { useQuery } from '@apollo/client';
+import { useReactiveVar, useQuery } from '@apollo/client';
 import { GET_STREAMS_QUERY } from '../../apis/graghQL';
 import { authVar } from '../../apolloClient';
 
 const StreamList = () => {
-  const { userId, isSignedIn } = authVar;
-
+  const { userId, isSignedIn } = useReactiveVar(authVar);
   const { data, loading, error } = useQuery(GET_STREAMS_QUERY);
+
   if (loading) {
     return <div>Loading</div>;
   }
@@ -17,10 +17,9 @@ const StreamList = () => {
   }
 
   const streams = data.allStreams;
-  console.log(streams);
 
   const renderAdmin = (stream) => {
-    if (stream.userId === userId) {
+    if (stream.userId && stream.userId === userId) {
       return (
         <div className="right floated content">
           <Link 

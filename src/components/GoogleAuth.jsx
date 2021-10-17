@@ -6,6 +6,19 @@ const GoogleAuth = () => {
   const authState = useReactiveVar(authVar);
   const auth = useRef();
 
+  const addUserDataToReactiveVar = (authRef) => {
+    if (authRef.current.isSignedIn.get()) {
+      authVar({
+        isSignedIn: true,
+        userId: authRef.current.currentUser.get().getId()
+      });
+    } else {
+      authVar({
+        ...authInitialState
+      });
+    }
+  }
+
   useEffect(() => {
     window.gapi.load('client:auth2', () => {
       window.gapi.client.init({
@@ -13,23 +26,23 @@ const GoogleAuth = () => {
         scope: 'email'
       }).then(() => {
         auth.current = window.gapi.auth2.getAuthInstance();
+        addUserDataToReactiveVar(auth);
       });
     });
-  });
+  }, []);
 
   const onSignInClick = () => {
-    auth.current.signIn();
-    authVar({
-      isSignedIn: true,
-      userId: auth.current.currentUser.get().getId()
-    });
+    auth.current.signIn()
+      .then(() => {
+        addUserDataToReactiveVar(auth);
+      });
   }
 
   const onSignOutClick = () => {
-    auth.current.signOut();
-    authVar({
-      ...authInitialState
-    });
+    auth.current.signOut()
+      .then(() => {
+        addUserDataToReactiveVar(auth);
+      });
   }
 
   const renderAuthButton = () => {
